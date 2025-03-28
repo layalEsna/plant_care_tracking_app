@@ -163,10 +163,35 @@ class Signup(Resource):
         except Exception as e:
             return make_response(jsonify({'error': f'Internal error: {e}'}), 500)
 
+class Login(Resource):
+    def post(self):
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+
+        if not all([username, password]):
+            return {'error': 'All fields are required'}, 400
+
+
+        user = User.query.filter(User.username == username).first()
+
+        if not user or not user.check_password(password):
+            return {'error': 'Username or password not found'}, 404
+        print("Session user_id before login:", session.get("user_id"))
+
+        session['user_id'] = user.id
+        session.permanent = True
+        return {
+                'username': user.username,
+                'id': user.id
+            }, 200
+    
+
 
     
 api.add_resource(CheckSession,'/check_session')
 api.add_resource(Signup, '/signup')
+api.add_resource(Login, '/login')
 
 
 if __name__ == '__main__':
