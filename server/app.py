@@ -128,7 +128,45 @@ class CheckSession(Resource):
         
         return jsonify(result), 200
     
+class Signup(Resource):
+    
+    def post(self):
+
+        try:
+            data = request.get_json()
+            username = data.get('username')
+           
+            password = data.get('password')
+            confirm_password = data.get('confirm_password')
+
+            if not all([username, password, confirm_password]):
+                return make_response(jsonify({'error': 'All the fields are required.'}), 400)
+            if password != confirm_password:
+                return make_response(jsonify({'error': 'Password not match.'}), 400)
+            if User.query.filter(User.username==username).first():
+                return make_response(jsonify({'error': 'unique constraint'}), 400)
+            
+            
+            new_user = User(
+                username = username,
+                password = password,
+                
+            )
+
+            db.session.add(new_user)
+            db.session.commit()            
+            session['user_id'] = new_user.id
+            session.permanent = True 
+
+            return make_response(jsonify({'id': new_user.id, 'username': new_user.username}), 201)
+
+        except Exception as e:
+            return make_response(jsonify({'error': f'Internal error: {e}'}), 500)
+
+
+    
 api.add_resource(CheckSession,'/check_session')
+api.add_resource(Signup, '/signup')
 
 
 if __name__ == '__main__':
