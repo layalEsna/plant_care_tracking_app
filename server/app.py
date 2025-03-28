@@ -104,6 +104,33 @@ Session(app)
 def index():
     return '<h1>Project Server</h1>'
 
+
+class CheckSession(Resource):
+    def get(self):
+        user_id = session.get('user_id')
+        if not user_id:
+            return {'error': 'Unauthorized.'}, 401
+        user = User.query.get(user_id)
+        if not user:
+            return {'error': 'User not found.'}, 404
+        print('User data:', user)
+        
+        user_schema = UserSchema()
+        plants_schema = PlantSchema(many=True)
+        category_schema = CategorySchema(many=True)
+
+        plants = user.plants
+        categories = Category.query.all()
+
+        result = user_schema.dump(user)
+        result['plants'] = plants_schema.dump(plants)
+        result['categories'] = category_schema.dump(categories)
+        
+        return jsonify(result), 200
+    
+api.add_resource(CheckSession,'/check_session')
+
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
 
