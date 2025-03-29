@@ -16,7 +16,7 @@ export const AppProvider = ({ children }) => {
         fetch('/check_session')
             .then(res => {
                 if (!res.ok) {
-                    console.log("Raw Response:", res)
+                    
 
                 throw new Error('Failed to fetch data.')
                 }

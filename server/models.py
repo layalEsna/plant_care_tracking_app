@@ -151,34 +151,34 @@ class CareNote(db.Model):
             raise ValueError('custom_interval must be a positive integer.')
         return custom_interval
     
+
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = User
         load_instance = True
-    plants = fields.Nested('PlantsSchema', many=True)
-
+        exclude = ('password_hash',)
+    plants = fields.Nested('PlantSchema', many=True, exclude=('user',))  # Exclude user from plants
+    
 class PlantSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Plant
         load_instance = True
-    user = fields.Nested('UserSchema')
-    category = fields.Nested('CategorySchema')
-    care_notes = fields.Nested('CareNoteSchema', many=True)
+    user = fields.Nested('UserSchema', exclude=('plants',))  
+    category = fields.Nested('CategorySchema', exclude=('plants',))  
+    # exclude=('plant',)
+    care_notes = fields.Nested('CareNoteSchema', many=True, exclude=('plant',))
     created_at = fields.Date(format='%Y-%m-%d')
 
 class CategorySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Category
         load_instance = True
-    plants = fields.Nested('PlantSchema', many=True)
-
+    plants = fields.Nested('PlantSchema', many=True, exclude=('category',))  
 
 class CareNoteSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = CareNote
         load_instance = True
-    # plants = fields.Nested('PlantSchema', many=True)
-    plant = fields.Nested('PlantSchema')
+    plant = fields.Nested('PlantSchema', exclude=('user', 'care_notes',))
     starting_date = fields.Date(format='%Y-%m-%d')
     next_care_date = fields.Date(format='%Y-%m-%d')
-
