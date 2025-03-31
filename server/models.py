@@ -54,7 +54,14 @@ class User(db.Model):
         self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def check_password(self, password):
-        return bcrypt.check_password_hash(self.password_hash, password)
+        print(f"Stored hash: {self.password_hash}")
+        print(f"Input password: {password}")
+        result = bcrypt.check_password_hash(self.password_hash, password)
+        print(f"Bcrypt result: {result}")
+        return result
+
+    # def check_password(self, password):
+    #     return bcrypt.check_password_hash(self.password_hash, password)
 
 class Plant(db.Model):
     __tablename__ = 'plants'
@@ -152,13 +159,6 @@ class CareNote(db.Model):
         return custom_interval
     
 
-class UserSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = User
-        load_instance = True
-        exclude = ('password_hash',)
-    plants = fields.Nested('PlantSchema', many=True, exclude=('user',))  # Exclude user from plants
-    
 class PlantSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Plant
@@ -173,7 +173,12 @@ class CategorySchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Category
         load_instance = True
-    plants = fields.Nested('PlantSchema', many=True, exclude=('category',))  
+    plants = fields.Nested('PlantSchema', many=True, exclude=('category', 'user'))
+    # categories = fields.Method('get_categories')
+    # def get_categories(self, user):
+    #     user_categories = {plant.category for plant in user.plants}
+    #     return CategorySchema(many=True).dump(user_categories)
+
 
 class CareNoteSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -182,3 +187,29 @@ class CareNoteSchema(SQLAlchemyAutoSchema):
     plant = fields.Nested('PlantSchema', exclude=('user', 'care_notes',))
     starting_date = fields.Date(format='%Y-%m-%d')
     next_care_date = fields.Date(format='%Y-%m-%d')
+
+class UserSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = User
+        include_relationships = True
+        load_instance = True
+        exclude = ('password_hash',)
+    plants = fields.Nested('PlantSchema', many=True, exclude=('user',))  # Exclude user from plants
+    # categories = fields.Nested(CategorySchema, many=True)
+    categories = fields.Method('get_categories')
+
+    def get_categories(self, user):
+    # Ensure unique categories only from the user's plants
+        if not user.plants:
+            return []  # If user has no plants, return empty list
+
+    
+        unique_category_names = list({plant.category.category_name for plant in user.plants if plant.category})
+        
+    # Print debugging information
+        print(f"\nUser ID: {user.id}")
+        print("User's Plants and Categories:")
+        for plant in user.plants:
+            print(f"- {plant.plant_name}: {plant.category.category_name if plant.category else 'No Category'}")
+        return unique_category_names 
+        

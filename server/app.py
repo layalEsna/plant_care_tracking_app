@@ -1,13 +1,12 @@
 
 
-###################### plants_schema
-
+###################### SESSION_TYPE
 from flask import Flask, request, make_response, jsonify, session
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
-from models import db, bcrypt, User, Category, Plant, CareNote, PlantSchema, UserSchema, CategorySchema, CareNoteSchema
-# from server.models import db, bcrypt, User, Category, Plant, CareNote, PlantSchema, UserSchema, CategorySchema, CareNoteSchema
+# from .models import db, bcrypt, User, Category, Plant, CareNote, PlantSchema, UserSchema, CategorySchema, CareNoteSchema
+from server.models import db, bcrypt, User, Category, Plant, CareNote, PlantSchema, UserSchema, CategorySchema, CareNoteSchema
 
 from werkzeug.security import generate_password_hash
 from flask_session import Session
@@ -19,10 +18,9 @@ load_dotenv()
 
 # Instantiate app
 app = Flask(__name__)
-# app.config.from_object('config.Config')  # Use string to avoid circular import issues.
-# app.config.from_object('server.config.Config')
-# from server.config import Config
-from config import Config
+# from .config import Config
+from server.config import Config
+
 
 app.config.from_object(Config)
 
@@ -64,14 +62,16 @@ class CheckSession(Resource):
         category_schema = CategorySchema(many=True)
 
         plants = user.plants
-        categories = Category.query.all()
-
+        
+        categories = list(set(plant.category for plant in user.plants if plant.category))
+        
         result = user_schema.dump(user)
         result['plants'] = plants_schema.dump(plants)
         result['categories'] = category_schema.dump(categories)
         
         return result, 200
-    
+
+ 
 class Signup(Resource):
     
     def post(self):
@@ -107,40 +107,58 @@ class Signup(Resource):
         except Exception as e:
             return make_response(jsonify({'error': f'Internal error: {e}'}), 500)
 
+
 class Login(Resource):
     def post(self):
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
 
-        if not all([username, password]):
-            return {'error': 'All fields are required'}, 400
+        print(f"Login attempt: username='{username}', password='{password}'")
 
+        if not all([username, password]):
+            print("Error: Missing username or password")
+            return {'error': 'All fields are required'}, 400
 
         user = User.query.filter(User.username == username).first()
 
+        if user:
+            print(f"User found: username='{user.username}', password_hash='{user.password_hash}'")
+        else:
+            print("User not found in database.")
+
         if not user or not user.check_password(password):
+            print("Error: Incorrect username or password")
             return {'error': 'Username or password not found'}, 404
-        print("Session user_id before login:", session.get("user_id"))
+
+        print("Login successful")
 
         session['user_id'] = user.id
         session.permanent = True
         return {
-                'username': user.username,
-                'id': user.id
-            }, 200
-    
+            'username': user.username,
+            'id': user.id
+        }, 200   
+
+        
 class UserById(Resource):
     def get(self, user_id):
         user_session_id = session.get('user_id')
         if user_session_id is None or user_session_id != user_id:
             return {'error': 'Unauthorized or user not found.'}, 403
+        
         user = User.query.get(user_id)
         if not user:
             return {'error': 'User not found.'}, 404
-        user_schema = UserSchema()
-        return jsonify(user_schema.dump(user)), 200
         
+        
+        categories = [plant.category.category_name for plant in user.plants if plant.category]
+        
+       
+        user_data = UserSchema().dump(user)
+        user_data['categories'] = categories
+        
+        return user_data, 200
 
 
 
@@ -165,6 +183,8 @@ if __name__ == '__main__':
 
 # export PYTHONPATH=$(pwd)/server
 # python server/seed.py
+
+# sqlite3 /Users/layla/Development/code/se-prep/phase-4/plant_care_tracking_app/server/instance/app.db
 
 
 
