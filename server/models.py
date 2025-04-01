@@ -90,8 +90,7 @@ class Plant(db.Model):
         if not created_at or not isinstance(created_at, date):
             raise ValueError('created_at is required and must be a date type.')
         return created_at
-        
-      
+            
 class Category(db.Model):
     __tablename__ = 'categories'
 
@@ -165,7 +164,7 @@ class PlantSchema(SQLAlchemyAutoSchema):
         load_instance = True
     user = fields.Nested('UserSchema', exclude=('plants',))  
     category = fields.Nested('CategorySchema', exclude=('plants',))  
-    # exclude=('plant',)
+    
     care_notes = fields.Nested('CareNoteSchema', many=True, exclude=('plant',))
     created_at = fields.Date(format='%Y-%m-%d')
 
@@ -194,22 +193,21 @@ class UserSchema(SQLAlchemyAutoSchema):
         include_relationships = True
         load_instance = True
         exclude = ('password_hash',)
-    plants = fields.Nested('PlantSchema', many=True, exclude=('user',))  # Exclude user from plants
-    # categories = fields.Nested(CategorySchema, many=True)
+    plants = fields.Nested('PlantSchema', many=True, exclude=('user',))  
     categories = fields.Method('get_categories')
 
     def get_categories(self, user):
-    # Ensure unique categories only from the user's plants
+    
         if not user.plants:
-            return []  # If user has no plants, return empty list
-
+            return []  
     
         unique_category_names = list({plant.category.category_name for plant in user.plants if plant.category})
-        
-    # Print debugging information
-        print(f"\nUser ID: {user.id}")
-        print("User's Plants and Categories:")
-        for plant in user.plants:
-            print(f"- {plant.plant_name}: {plant.category.category_name if plant.category else 'No Category'}")
         return unique_category_names 
-        
+
+
+
+
+
+
+    
+

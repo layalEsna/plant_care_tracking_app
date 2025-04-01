@@ -6,6 +6,7 @@ import Signup from "./Signup";
 
 import LandingPage from "./LandingPage";
 import Login from "./Login";
+import UserCategory from "./UserCategory";
 
 
 function App() {
@@ -15,7 +16,8 @@ function App() {
         <Routes>
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/users/:user_id" element={<LandingPage/>} />
+          <Route path="/users/:user_id" element={<LandingPage />} />
+          <Route path="/users/categories/:categoryId" element={<UserCategory/> } />
         </Routes>
       </Router>
     </AppProvider>

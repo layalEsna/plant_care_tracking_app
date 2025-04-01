@@ -58,18 +58,43 @@ class CheckSession(Resource):
         
         
         user_schema = UserSchema()
-        plants_schema = PlantSchema(many=True)
-        category_schema = CategorySchema(many=True)
+        
+        result_user = user_schema.dump(user)
+        
+        
+        return result_user, 200
 
-        plants = user.plants
+
+# class CheckSession(Resource):
+#     def get(self):
+#         user_id = session.get('user_id')
+#         if not user_id:
+#             return {'error': 'Unauthorized.'}, 401
+#         user = User.query.get(user_id)
+#         if not user:
+#             return {'error': 'User not found.'}, 404
         
-        categories = list(set(plant.category for plant in user.plants if plant.category))
         
-        result = user_schema.dump(user)
-        result['plants'] = plants_schema.dump(plants)
-        result['categories'] = category_schema.dump(categories)
+#         user_schema = UserSchema()
+#         plants_schema = PlantSchema(many=True)
+#         category_schema = CategorySchema(many=True)
+
+#         plants = user.plants
         
-        return result, 200
+#         categories = list(set(plant.category for plant in user.plants if plant.category))
+        
+#         result_user = user_schema.dump(user)
+#         result_plants = plants_schema.dump(plants)
+#         result_cats = category_schema.dump(categories)
+
+#         result_data = {
+#             'user': result_user,
+#             'plants': result_plants,
+#             'categories': result_cats
+#         }
+
+                
+#         return result_data, 200
 
  
 class Signup(Resource):
