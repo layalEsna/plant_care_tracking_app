@@ -47,24 +47,6 @@ def index():
     return '<h1>Project Server</h1>'
 
 
-class CheckSession(Resource):
-    def get(self):
-        user_id = session.get('user_id')
-        if not user_id:
-            return {'error': 'Unauthorized.'}, 401
-        user = User.query.get(user_id)
-        if not user:
-            return {'error': 'User not found.'}, 404
-        
-        
-        user_schema = UserSchema()
-        
-        result_user = user_schema.dump(user)
-        
-        
-        return result_user, 200
-
-
 # class CheckSession(Resource):
 #     def get(self):
 #         user_id = session.get('user_id')
@@ -76,27 +58,67 @@ class CheckSession(Resource):
         
         
 #         user_schema = UserSchema()
-#         plants_schema = PlantSchema(many=True)
-#         category_schema = CategorySchema(many=True)
-
-#         plants = user.plants
-        
-#         categories = list(set(plant.category for plant in user.plants if plant.category))
         
 #         result_user = user_schema.dump(user)
-#         result_plants = plants_schema.dump(plants)
-#         result_cats = category_schema.dump(categories)
+        
+        
+#         return result_user, 200
 
-#         result_data = {
-#             'user': result_user,
-#             'plants': result_plants,
-#             'categories': result_cats
-#         }
+
+class CheckSession(Resource):
+    def get(self):
+        user_id = session.get('user_id')
+        if not user_id:
+            return {'error': 'Unauthorized.'}, 401
+        user = User.query.get(user_id)
+        if not user:
+            return {'error': 'User not found.'}, 404
+        
+        
+        user_schema = UserSchema()
+        plants_schema = PlantSchema(many=True)
+        category_schema = CategorySchema(many=True)
+
+        plants = user.plants
+        
+        categories = list(set(plant.category for plant in user.plants if plant.category))
+        
+        result_user = user_schema.dump(user)
+        result_plants = plants_schema.dump(plants)
+        result_cats = category_schema.dump(categories)
+
+        result_data = {
+            'user': result_user,
+            'plants': result_plants,
+            'categories': result_cats
+        }
 
                 
-#         return result_data, 200
+        return result_data, 200
 
  
+
+
+# class CheckSession(Resource):
+#     def get(self):
+#         user_id = session.get('user_id')
+#         if not user_id:
+#             return {'error': 'Unauthorized.'}, 401
+#         user = User.query.get(user_id)
+#         if not user:
+#             return {'error': 'User not found.'}, 404
+
+#         user_schema = UserSchema()
+#         result = user_schema.dump(user)
+
+#         # Ensure categories are returned as objects
+#         categories = list(set(plant.category for plant in user.plants if plant.category))
+#         category_schema = CategorySchema(many=True)
+#         result['categories'] = category_schema.dump(categories)
+
+#         return result, 200
+    
+
 class Signup(Resource):
     
     def post(self):
