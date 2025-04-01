@@ -35,28 +35,28 @@ export const AppProvider = ({ children }) => {
             .catch(e => console.error("AppProvider useEffect error:", e))
     }, [])
 
-    // useEffect(() => {
-    //     // setCategoriesLoading(true)
-    //     fetch('/categories')
-    //         .then(res => {
-    //             if (!res.ok) {
-    //             throw new Error('Failed to fetch data.')
-    //             }
-    //             return res.json()
-    //     })
-    //         .then(data => {
-    //             console.log('fetched categories', data)
-    //             if(Array.isArray(data)){
-    //                 setAllCategories(data)
-    //             }
-    //             else {
-    //                 console.error(data)
-    //             }
-    //     })
-    //         .catch(e => console.error(e))
-    //         // .finally(() => setCategoriesLoading(false))
+    useEffect(() => {
+        // setCategoriesLoading(true)
+        fetch('/categories')
+            .then(res => {
+                if (!res.ok) {
+                throw new Error('Failed to fetch data.')
+                }
+                return res.json()
+        })
+            .then(data => {
+                console.log('fetched categories', data)
+                if(Array.isArray(data)){
+                    setAllCategories(data)
+                }
+                else {
+                    console.error(data)
+                }
+        })
+            .catch(e => console.error(e))
+            // .finally(() => setCategoriesLoading(false))
         
-    // }, [])
+    }, [])
 
     
 
