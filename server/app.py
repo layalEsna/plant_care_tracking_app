@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from flask_restful import Api, Resource
 # from .models import db, bcrypt, User, Category, Plant, CareNote, PlantSchema, UserSchema, CategorySchema, CareNoteSchema
 from server.models import db, bcrypt, User, Category, Plant, CareNote, PlantSchema, UserSchema, CategorySchema, CareNoteSchema
+from datetime import datetime
 
 from werkzeug.security import generate_password_hash
 from flask_session import Session
@@ -206,6 +207,51 @@ class UserById(Resource):
         user_data['categories'] = categories
         
         return user_data, 200
+    
+class PlantForm(Resource):
+    def post(self):
+        data = request.get_json()
+        plant_name = data.get('plant_name')
+        image = data.get('image')
+        created_at = data.get('created_at')
+        user_id = data.get('user_id')
+        category_id = data.get('category_id')
+
+        if not plant_name or not isinstance(plant_name, str):
+            return {'error':'Plant name is required and must be a string.'}, 400
+        if len(plant_name) < 2 or len(plant_name) > 100:
+            return {'error': 'Plant name must be between 2 and 100 charachters.'}, 400
+        try:
+            created_at = datetime.strptime(created_at, "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            return {'error': 'created_at is required and must be in YYYY-MM-DD format.'}, 400
+        if not user_id or not isinstance(user_id, int):
+            return {'error': 'user_id is required and must be an integer.'}, 400
+        if not category_id or not isinstance(category_id, int):
+            return {'error': 'category_id is required and must be an integer.'}, 400
+
+       
+        new_plant = Plant(
+            plant_name = plant_name,
+            image = image,
+            created_at = created_at,
+            user_id = user_id,
+            category_id = category_id
+
+        )
+        db.session.add(new_plant)
+        db.session.commit()
+        # session['plant_id'] = new_plant.id
+
+        return jsonify({
+            'id': new_plant.id,
+            'plant_name': new_plant.plant_name,
+            'image': new_plant.image,
+            'created_at': str(new_plant.created_at),
+            'user_id': new_plant.user_id,
+            'category_id': new_plant.category_id
+        }), 201
+
 
 
 
@@ -214,6 +260,7 @@ api.add_resource(CheckSession,'/check_session')
 api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(UserById, '/users/<int:user_id>')
+api.add_resource(PlantForm, '/plants')
 
 
 

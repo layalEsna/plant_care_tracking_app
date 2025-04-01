@@ -25,6 +25,7 @@ const LandingPage = () => {
 
     return (
         <div>
+            <h3>My Categories</h3>
             {user.user.username && <h4>Welcome: {user.user.username}</h4>}
 
             {user.plants && user.plants.length ? (
