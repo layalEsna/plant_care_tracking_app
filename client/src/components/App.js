@@ -20,6 +20,7 @@ function App() {
           <Route path="/users/:user_id" element={<LandingPage />} />
           <Route path="/users/categories/:categoryId" element={<UserCategory/> } />
           <Route path="/plants" element={<PlantForm/> } />
+           
         </Routes>
       </Router>
     </AppProvider>

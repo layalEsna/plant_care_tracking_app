@@ -252,18 +252,23 @@ class PlantForm(Resource):
             'category_id': new_plant.category_id
         }), 201
     
+
+
+
 class Categories(Resource):
     def get(self):
         categories = Category.query.all()
 
         if not categories:
             return {'message': 'No category exists.'}, 200
-        return jsonify([
-            {
-                'category_name':category.category_name,
-                'id': category.id
-                         } for category in categories]), 200
 
+        return [
+            {
+                'category_name': category.category_name,
+                'id': category.id
+            } for category in categories
+        ], 200
+        
 
 
 

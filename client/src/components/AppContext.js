@@ -7,6 +7,8 @@ export const AppProvider = ({ children }) => {
     const [plants, setPlants] = useState([])
     const [categories, setCategories] = useState([])
     const [selectedCategoryId, setSelectedCategoryId] = useState(null)
+    const [allCategories, setAllCategories] = useState([])
+    // const [categoriesLoading, setCategoriesLoading] = useState(true)
 
     function setPlantsData(plantsData) {
         setPlants(plantsData)
@@ -24,17 +26,42 @@ export const AppProvider = ({ children }) => {
                 return res.json()
             })
             .then(data => {
-                console.log("Data from /check_session:", data); // Add this log
+                
                 setUser(data)
-                console.log("User state after setting:", data)
+                
                 setCategories(data.categories)
                 setPlantsData(data.plants)
             })
             .catch(e => console.error("AppProvider useEffect error:", e))
     }, [])
 
+    // useEffect(() => {
+    //     // setCategoriesLoading(true)
+    //     fetch('/categories')
+    //         .then(res => {
+    //             if (!res.ok) {
+    //             throw new Error('Failed to fetch data.')
+    //             }
+    //             return res.json()
+    //     })
+    //         .then(data => {
+    //             console.log('fetched categories', data)
+    //             if(Array.isArray(data)){
+    //                 setAllCategories(data)
+    //             }
+    //             else {
+    //                 console.error(data)
+    //             }
+    //     })
+    //         .catch(e => console.error(e))
+    //         // .finally(() => setCategoriesLoading(false))
+        
+    // }, [])
+
+    
+
     return (
-        <AppContext.Provider value={{ user, setUser, plants, setPlants, categories, setCategories, selectedCategoryId, setSelectedCategoryId }}>
+        <AppContext.Provider value={{ user, setUser, plants, setPlants, categories, setCategories, selectedCategoryId, setSelectedCategoryId, allCategories }}>
             {children}
         </AppContext.Provider>
     )
