@@ -5,18 +5,18 @@ import { useContext } from "react"
 import AppContext from "./AppContext"
 
 const PlantForm = () => {
-    const { allCategories } = useContext(AppContext)
-    // const { allCategories, categoriesLoading } = useContext(AppContext);
+    const { allCategories, addNewCategory, user} = useContext(AppContext)
+    
 
 
-    console.log('all categories', allCategories)
+    
     const formik = useFormik(
         {
             initialValues: {
                 plant_name: '',
                 image: '',
                 created_at: '',
-                category: ''
+                category_id: ''
             },
             
             validationSchema: Yup.object({
@@ -29,36 +29,44 @@ const PlantForm = () => {
                 created_at: Yup.date()
                     .required('created_at field is required')
                     .typeError('Invalid date format'),
-                category: Yup.string()
-                .required('Category is required.')
+                category_id: Yup.number()
+                    .required('Category ID is required.')
+                    .positive('Category must be a valid number.')
+                    .integer('Category must be an integer.')
 
 
             }),
             onSubmit: (values) => {
-                fetch('plants', {
+                
+                fetch('/new_plant', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(values)
+                    body: JSON.stringify({...values,user_id: user.user.id, category_id: Number(values.category_id)})
                 })
                     .then(res => {
+                        
                         if (!res.ok) {
                             throw new Error('failed to fetch data.')
                         }
                         return res.json()
                     })
                     .then(data => {
-                        console.log(data)
+                        
+                        if (data.category) {
+                            
+                            addNewCategory(data.category)
+                        }
 
                     })
                     .catch(e => console.error(e))
             }
         }
     )
-    // if (categoriesLoading) {
-    //     return <div>Loading categories...</div>;
-    // }
+    
+    
+
     
     return (
         <div>
@@ -99,6 +107,7 @@ const PlantForm = () => {
                         type="date"
                         value={formik.values.created_at}
                         onChange={formik.handleChange}
+                        
                         onBlur={formik.handleBlur}
                     />
                     {formik.errors.created_at && formik.touched.created_at && (
@@ -106,11 +115,11 @@ const PlantForm = () => {
                     )}
                 </div>
                 <div>
-                    <label htmlFor="category">Categories:</label>
+                    <label htmlFor="category_id">Categories:</label>
                     <select
-                        id="category"
-                        name="category"
-                        value={formik.values.category}
+                        id="category_id"
+                        name="category_id"
+                        value={formik.values.category_id}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     >
@@ -132,8 +141,14 @@ const PlantForm = () => {
 
             </form>
 
+            
+            
+
+
         </div>
     )
+    
+
 }
 
 export default PlantForm

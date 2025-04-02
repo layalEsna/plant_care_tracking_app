@@ -5,7 +5,8 @@
 import { useContext } from "react"
 import AppContext from "./AppContext"
 import { Link } from "react-router-dom"
-
+import PlantForm from "./PlantForm"
+// fetch categories
 const LandingPage = () => {
     const { user, setSelectedCategoryId } = useContext(AppContext)
 
@@ -50,6 +51,11 @@ const LandingPage = () => {
             ) : (
                 <div>No categories found</div>
             )}
+
+            <div>
+                <h5>Add A Plant</h5>
+          <PlantForm/>
+          </div>
         </div>
     )
 }

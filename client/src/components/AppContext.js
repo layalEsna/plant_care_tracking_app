@@ -8,7 +8,7 @@ export const AppProvider = ({ children }) => {
     const [categories, setCategories] = useState([])
     const [selectedCategoryId, setSelectedCategoryId] = useState(null)
     const [allCategories, setAllCategories] = useState([])
-    // const [categoriesLoading, setCategoriesLoading] = useState(true)
+    // const [categoriesLoading, setCategoriesLoading] = useState(true) 
 
     function setPlantsData(plantsData) {
         setPlants(plantsData)
@@ -58,10 +58,19 @@ export const AppProvider = ({ children }) => {
         
     }, [])
 
-    
+    function addNewCategory(newCategory) {
+        console.log("Adding new category:", newCategory)
+        setCategories(prevCat => {
+            if (!prevCat.some(cat => cat.id === newCategory.id)) {
+                return [...prevCat, newCategory]
+            } else {
+                return prevCat
+            }
+        })
+    }
 
     return (
-        <AppContext.Provider value={{ user, setUser, plants, setPlants, categories, setCategories, selectedCategoryId, setSelectedCategoryId, allCategories }}>
+        <AppContext.Provider value={{ user, setUser, plants, setPlants, categories, setCategories, selectedCategoryId, setSelectedCategoryId, allCategories, addNewCategory }}>
             {children}
         </AppContext.Provider>
     )

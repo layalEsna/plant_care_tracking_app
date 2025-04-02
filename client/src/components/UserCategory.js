@@ -3,6 +3,7 @@
 
 import { useContext } from "react";
 import AppContext from "./AppContext";
+import PlantForm from "./PlantForm";
 
 const UserCategory = () => {
   const { user, plants, categories, selectedCategoryId } = useContext(AppContext)
@@ -37,7 +38,11 @@ const UserCategory = () => {
         </div>
       ) : (
         <p>No plants available in this category.</p>
-      )}
+          )}
+          {/* <div>
+          <PlantForm/>
+          </div> */}
+          
     </div>
   )
 }
