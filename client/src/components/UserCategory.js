@@ -1,22 +1,21 @@
-
-
-
 import { useContext } from "react";
 import AppContext from "./AppContext";
-import PlantForm from "./PlantForm";
+
 
 const UserCategory = () => {
   const { user, plants, categories, selectedCategoryId } = useContext(AppContext)
 
-  if (!user) {
-    return <p>Loading...</p>
-  }
-  console.log("Selected Category ID:", selectedCategoryId)
+
+    
+    if (!user || !user.user) {
+        return <p>Loading...</p>
+      }
+  
 
   
-  if (!selectedCategoryId) {
-    return <p>No category selected.</p>
-  }
+//   if (!selectedCategoryId) {
+//     return <p>No category selected.</p>
+//   }
 
   
   const category = categories.find(cat => cat.id === selectedCategoryId)
@@ -27,7 +26,9 @@ const UserCategory = () => {
 
   return (
     <div>
-      <h4>{user.username}</h4>
+          <h4>{user.user.username}</h4>
+          
+
       <p>{categoryName}</p>
 
       {filteredPlants.length > 0 ? (
@@ -39,13 +40,10 @@ const UserCategory = () => {
       ) : (
         <p>No plants available in this category.</p>
           )}
-          {/* <div>
-          <PlantForm/>
-          </div> */}
+
           
     </div>
   )
 }
 
 export default UserCategory
-

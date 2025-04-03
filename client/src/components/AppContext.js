@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect} from 'react'
 
 const AppContext = createContext()
@@ -16,10 +15,10 @@ export const AppProvider = ({ children }) => {
 
     useEffect(() => {
         
-        // const storedCategoryId = localStorage.getItem('selectedCategoryId')
-        // if (storedCategoryId) {
-        //     setSelectedCategoryId(parseInt(storedCategoryId))
-        // }
+        const storedCategoryId = localStorage.getItem('selectedCategoryId')
+        if (storedCategoryId) {
+            setSelectedCategoryId(parseInt(storedCategoryId))
+        }
 
         fetch('/check_session')
             .then(res => {
@@ -34,7 +33,7 @@ export const AppProvider = ({ children }) => {
             })
             .catch(e => console.error("AppProvider useEffect error:", e))
             console.log("Updated allCategories:", allCategories)
-    }, [allCategories])
+    }, [])
 
     useEffect(() => {
        
