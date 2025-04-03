@@ -1,8 +1,8 @@
-
 import { useFormik } from "formik"
 import * as Yup from 'yup'
 import { useContext } from "react"
 import AppContext from "./AppContext"
+import NewCategory from "./NewCategory"
 
 const PlantForm = () => {
     const { allCategories, addNewCategory, user, addNewCategoryToDb } = useContext(AppContext)
@@ -35,17 +35,13 @@ const PlantForm = () => {
                         "category-or-new",
                         "You must select a category or add a new one.",
                         function (value) {
-                            return value || this.parent.new_cat; // Valid if either category_id or new_cat is provided
+                            return value || this.parent.new_cat
                         }
                     )
 
                     .required('Category ID is required.')
                     .positive('Category must be a valid number.')
                     .integer('Category must be an integer.')
-
-
-                
-
 
             }),
             onSubmit: (values) => {
@@ -58,7 +54,7 @@ const PlantForm = () => {
                 }
 
                 if (values.new_cat) {
-                    requestBody.new_category_name = values.new_cat;  // Send new category
+                    requestBody.new_category_name = values.new_cat;
                 } else {
                     requestBody.category_id = Number(values.category_id);
                 }
@@ -72,7 +68,7 @@ const PlantForm = () => {
 
                     body: JSON.stringify(requestBody)
 
-                    // body: JSON.stringify({ ...values, user_id: user.user.id, category_id: Number(values.category_id) })
+
                 })
                     .then(res => {
 
@@ -91,7 +87,7 @@ const PlantForm = () => {
                         }
 
                         if (data.plant) {
-                            console.log("New Plant Added:", data.plant);
+                            
                         }
 
                     })
@@ -149,7 +145,7 @@ const PlantForm = () => {
                         <div className="error">{formik.errors.created_at}</div>
                     )}
                 </div>
-                {/* new */}
+
 
                 <div>
                     <label htmlFor="category_id">Categories</label>
@@ -159,10 +155,6 @@ const PlantForm = () => {
                         value={formik.values.category_id}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        disabled={formik.values.new_cat.trim().length > 0}
-
-                        // disabled={!!formik.values.new_cat}
-
 
                     >
                         <option value=''>select one</option>
@@ -172,63 +164,10 @@ const PlantForm = () => {
                             ))
                         )
 
-
-
-                        }
+                       }
                     </select>
-                    <div>
-                        <label htmlFor="new_cat">Add New Category</label>
-                        <input
-                            id="new_cat"
-                            name="new_cat"
-                            value={formik.values.new_cat}
-                            onBlur={formik.handleBlur}
-                            onChange={formik.handleChange}
-                            disabled={formik.values.category_id !== ''}
 
-                            // disabled={formik.values.new_cat.trim().length > 0}
-
-
-                            // disabled={!!formik.values.category_id}
-
-                        />
-
-                    </div>
                 </div>
-
-
-
-                {/* new */}
-
-
-
-
-                {/* <div>
-                    <label htmlFor="category_id">Categories:</label>
-                    <select
-                        id="category_id"
-                        name="category_id"
-                        value={formik.values.category_id}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    >
-                        <option value=''>Select one</option>
-                        {allCategories && allCategories.map(cat => (
-                            <option key={cat.id} value={cat.id}>
-                                {cat.category_name}
-                            </option>
-                        ))}
-                        <option value='other'>other
-                           
-                        </option>
-
-                    </select>
-                    {formik.errors.category && formik.touched.category && (
-                        <div>{formik.errors.category}</div>
-                    )}
-                </div> */}
-
-
 
                 <div>
                     <button type="submit">Add Plant</button>
@@ -237,7 +176,9 @@ const PlantForm = () => {
             </form>
 
 
-
+            <div>
+                <NewCategory />
+            </div>
 
 
         </div>
@@ -247,3 +188,9 @@ const PlantForm = () => {
 }
 
 export default PlantForm
+
+
+
+
+
+

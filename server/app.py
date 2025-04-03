@@ -299,8 +299,6 @@ class NewCategory(Resource):
         return category_data, 201
         
 
-
-
 class Categories(Resource):
     def get(self):
         categories = Category.query.all()

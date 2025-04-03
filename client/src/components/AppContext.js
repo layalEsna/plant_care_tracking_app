@@ -8,18 +8,18 @@ export const AppProvider = ({ children }) => {
     const [categories, setCategories] = useState([])
     const [selectedCategoryId, setSelectedCategoryId] = useState(null)
     const [allCategories, setAllCategories] = useState([])
-    // const [categoriesLoading, setCategoriesLoading] = useState(true) 
+    
 
     function setPlantsData(plantsData) {
         setPlants(plantsData)
     }
 
     useEffect(() => {
-        // Retrieve selectedCategoryId from localStorage on initial load
-        const storedCategoryId = localStorage.getItem('selectedCategoryId');
-        if (storedCategoryId) {
-            setSelectedCategoryId(parseInt(storedCategoryId));
-        }
+        
+        // const storedCategoryId = localStorage.getItem('selectedCategoryId')
+        // if (storedCategoryId) {
+        //     setSelectedCategoryId(parseInt(storedCategoryId))
+        // }
 
         fetch('/check_session')
             .then(res => {
@@ -37,7 +37,7 @@ export const AppProvider = ({ children }) => {
     }, [allCategories])
 
     useEffect(() => {
-        // setCategoriesLoading(true)
+       
         fetch('/categories')
             .then(res => {
                 if (!res.ok) {
@@ -46,7 +46,7 @@ export const AppProvider = ({ children }) => {
                 return res.json()
         })
             .then(data => {
-                console.log('fetched categories', data)
+                
                 if(Array.isArray(data)){
                     setAllCategories(data)
                 }
@@ -55,7 +55,7 @@ export const AppProvider = ({ children }) => {
                 }
         })
             .catch(e => console.error(e))
-            // .finally(() => setCategoriesLoading(false))
+            
         
     }, [])
 
@@ -70,11 +70,11 @@ export const AppProvider = ({ children }) => {
         })
     }
     function addNewCategoryToDb(newCategory) {
-        console.log('adding category to dropdown', newCategory)
+        
 
         if (!newCategory) {
-            console.error("Error: newCategory is undefined");
-            return;
+            console.error("Error: newCategory is undefined")
+            return
         }
         setAllCategories(prevcat => {
             if (!prevcat.some(cat => cat.id === newCategory.id)) {
