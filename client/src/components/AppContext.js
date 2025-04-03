@@ -33,7 +33,8 @@ export const AppProvider = ({ children }) => {
                 setPlantsData(data.plants)
             })
             .catch(e => console.error("AppProvider useEffect error:", e))
-    }, [])
+            console.log("Updated allCategories:", allCategories)
+    }, [allCategories])
 
     useEffect(() => {
         // setCategoriesLoading(true)
@@ -68,9 +69,26 @@ export const AppProvider = ({ children }) => {
             }
         })
     }
+    function addNewCategoryToDb(newCategory) {
+        console.log('adding category to dropdown', newCategory)
+
+        if (!newCategory) {
+            console.error("Error: newCategory is undefined");
+            return;
+        }
+        setAllCategories(prevcat => {
+            if (!prevcat.some(cat => cat.id === newCategory.id)) {
+                console.log("Adding category to dropdown:", newCategory)
+                return [...prevcat, newCategory]
+            } else {
+                return prevcat
+            }
+        }
+        )
+    }
 
     return (
-        <AppContext.Provider value={{ user, setUser, plants, setPlants, categories, setCategories, selectedCategoryId, setSelectedCategoryId, allCategories, addNewCategory }}>
+        <AppContext.Provider value={{ user, setUser, plants, setPlants, categories, setCategories, selectedCategoryId, setSelectedCategoryId, allCategories, addNewCategory, addNewCategoryToDb }}>
             {children}
         </AppContext.Provider>
     )

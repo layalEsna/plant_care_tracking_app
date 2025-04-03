@@ -208,35 +208,42 @@ class UserById(Resource):
         user_data['categories'] = categories
         
         return user_data, 200
+    
 
 class NewPlant(Resource):
     def post(self):
         try:
             data = request.get_json()
-            print("Received data:", data)
 
-            
             plant_name = data.get('plant_name')
             image = data.get('image')
             created_at = data.get('created_at')
             user_id = data.get('user_id')
             category_id = data.get('category_id')
 
-            
+           
             if not plant_name or not isinstance(plant_name, str):
                 return {'error': 'Plant name is required and must be a string.'}, 400
             if len(plant_name) < 2 or len(plant_name) > 100:
                 return {'error': 'Plant name must be between 2 and 100 characters.'}, 400
 
+           
             try:
                 created_at = datetime.strptime(created_at, "%Y-%m-%d")
             except (ValueError, TypeError):
                 return {'error': 'created_at is required and must be in YYYY-MM-DD format.'}, 400
 
+            
             if not isinstance(user_id, int):
                 return {'error': 'user_id is required and must be an integer.'}, 400
+
+            
             if not isinstance(category_id, int):
                 return {'error': 'category_id is required and must be an integer.'}, 400
+            
+            category = Category.query.get(category_id)
+            if not category:
+                return {'error': 'Category not found'}, 400
 
             
             new_plant = Plant(
@@ -247,16 +254,9 @@ class NewPlant(Resource):
                 category_id=category_id
             )
 
-            
             db.session.add(new_plant)
             db.session.commit()
 
-            
-            category = Category.query.get(category_id)
-            if not category:
-                return {'error': 'Category not found'}, 400
-
-            
             return {
                 'plant': {
                     'id': new_plant.id,
@@ -273,9 +273,33 @@ class NewPlant(Resource):
             }, 201  
 
         except Exception as e:
-            print("Error occurred:", e)
+            
             return {'error': 'Internal Server Error', 'message': str(e)}, 500
+
+class NewCategory(Resource):
+    def post(self):
+        data = request.get_json()
+        category_name = data.get('category_name')
+
+        if not category_name or not isinstance(category_name, str):
+            return {'error': 'Category name is required and must be a string.'}, 400
+        if len(category_name) < 5 or len(category_name) > 100:
+            return {'error': 'Category name must be between 5 and 100 characters.'}, 400
+        existing_category = Category.query.filter(Category.category_name == category_name).first()
+        if existing_category:
+            return {'message': 'category already exists.'}, 200
         
+        new_category = Category(category_name = category_name)
+
+        db.session.add(new_category)
+        db.session.commit()
+
+        category_schema = CategorySchema()
+        category_data = category_schema.dump(new_category)
+        return category_data, 201
+        
+
+
 
 class Categories(Resource):
     def get(self):
@@ -298,6 +322,7 @@ api.add_resource(Login, '/login')
 api.add_resource(UserById, '/users/<int:user_id>')
 api.add_resource(NewPlant, '/new_plant')
 api.add_resource(Categories, '/categories')
+api.add_resource(NewCategory, '/new_category')
 
 
 
